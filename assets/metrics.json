@@ -1,12 +1,10 @@
 {
-  "probe_position_rmse_px": 0.733,
-  "forecast_mse_step1": 0.0005,
-  "forecast_mse_stepK": 0.02816,
-  "forecast_mse_mean": 0.01474,
+  "baseline_forecast_mse_mean": 0.0467,
+  "baseline_forecast_mse_step_1": 0.00715,
+  "baseline_forecast_mse_step_final": 0.04988,
   "forecast_horizon": 30,
-  "anomaly_injected_at": 24,
-  "anomaly_detected_at": 22,
-  "anomaly_peak_over_baseline": 88.4,
-  "decoder_recon_mse": null,
-  "weights_json_bytes": 1371593
+  "jepa_forecast_mse_mean": 0.00857,
+  "jepa_forecast_mse_step_1": 0.00147,
+  "jepa_forecast_mse_step_final": 0.02911,
+  "probe_position_rmse_px": 0.791
 }

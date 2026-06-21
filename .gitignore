@@ -5,21 +5,5 @@ __pycache__/
 .venv/
 .ipynb_checkpoints/
 
-# scratch / test artifacts
-_*.png
-web/_*.py
-/tmp/
-
-# latex build intermediates (we DO commit paper/main.pdf)
-paper/*.aux
-paper/*.log
-paper/*.out
-paper/*.bbl
-paper/*.blg
-
-# arxiv submission tarball (regenerate with paper/build_arxiv.sh; also a release asset)
-paper/dvd-jepa-arxiv.tar.gz
-
-# NOTE: we intentionally COMMIT these so the project is self-contained and the
-# live demo works without retraining:
-#   web/weights.json   checkpoints/dvd_jepa.pt   assets/*
+checkpoints
+uv.lock
