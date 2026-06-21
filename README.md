@@ -64,7 +64,7 @@ It is a super simple system that still has the property that matters: The system
 **Training objective.** Minimise the latent prediction error plus a variance term:
 
 $$
-\mathcal{L} = \bigl\| P\!\left(E_\theta(\text{obs}_t)\right) - \text{sg}\!\left(E_{\text{ema}}(\text{obs}_{t+1})\right) \bigr\|_2^2\;+\; \sum_d \text{ReLU}\!\left(1 - \text{std}(z_d)\right)
+\mathcal{L} = \bigl\| P\left(E_\theta(\text{obs}_t)\right) - \text{sg}\left(E_{\text{ema}}(\text{obs}_{t+1})\right) \bigr\|_2^2\;+\; \sum_d \text{ReLU}\left(1 - \text{std}(z_d)\right)
 $$
 
 The target encoder is an exponential moving average (`τ = 0.99`) of the online encoder with a stop-gradient — the [BYOL](#references) trick. Without the variance term the embedding collapses to a constant; with it, the embedding standard deviation holds at **~2.4–3.0** throughout training. The decoder is trained *separately* on the frozen encoder, so the JEPA does all the understanding and the decoder is only a readout.
