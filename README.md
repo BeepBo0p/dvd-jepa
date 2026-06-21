@@ -2,7 +2,7 @@
 
 # DVD-JEPA
 
-### A tiny, reproducible **Joint-Embedding Predictive Architecture** world model — that learns the physics of a noisy bouncing DVD logo in representation space and dreams its future. Compared to a pixel-space autoencoder-model baseline with roughly same parameter count and compute budget.
+### A tiny, reproducible **Joint-Embedding Predictive Architecture** world model — that learns the physics of a noisy bouncing DVD logo in representation space and dreams its future.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
@@ -12,19 +12,19 @@
 
 </div>
 
-> **Adapted from [mandarwagh9/dvd-jepa](https://github.com/mandarwagh9/dvd-jepa) by Mandar Wagh.** Contributions in this fork: Gaussian noise augmentation, code refactoring with consolidated configuration, and a revised comparison against a pixel-space baseline. Removed anomaly detection.
+> **Adapted from [mandarwagh9/dvd-jepa](https://github.com/mandarwagh9/dvd-jepa), a very neat idea by Mandar Wagh.** Contributions in this fork: Gaussian noise augmentation to dvd-environment, code refactoring with consolidated configuration, and a revised comparison against a pixel-space baseline. Removed anomaly detection section, web demo, and reworked notebook.
 
 ---
 
 ## Abstract
 
-Most attempts to learn a **world model** from video try to predict the next frame pixel-by-pixel, and drown in detail that is fundamentally unpredictable. **JEPA** (Joint-Embedding Predictive Architecture, [LeCun 2022](#references)) makes a different bet: predict a *representation* of the future, not the pixels, and let the encoder discard whatever it cannot predict. The classic example is that of a self-driving car. We'd rather have the agent controlling the car spend most of its efforts on learning driving dynamics, instead of learning to predict the rustling of leaves in the wind
+Most attempts to learn a **world model** from video try to predict the next frame pixel-by-pixel, and drown in detail that is fundamentally unpredictable. **JEPA** (Joint-Embedding Predictive Architecture, [LeCun 2022](#references)) makes a different bet: predict a *representation* of the future, not the pixels, and let the encoder discard whatever it cannot predict. LeCun's classic example is that of a self-driving car: We'd rather have the agent controlling the car spend most of its efforts on learning driving dynamics, instead of learning to predict the rustling of leaves in the wind.
 
 **DVD-JEPA** is a very small demonstration of that idea. The "world" is a DVD logo bouncing in a 16×16 box with added gaussian noise. A context encoder, an EMA target encoder, and a latent predictor are trained — with no labels and no decoder — to predict the next observation **in a 32-dimensional representation space**. We then show three things:
 
-1. **It learned the world.** A linear probe recovers the logo's exact (y, x) position from the frozen 32-d latent to within **0.87 px** — though it was never given a coordinate.
-2. **It can dream (once you add a decoder).** Bolt an optional decoder onto the frozen latents and roll the predictor forward: it renders a correct **future-frame video** of the bounce, including wall reflections, for ~20 steps before latent drift sets in.
-3. **Latent-space prediction beats pixel-space prediction.** An autoencoder-style pixel-space baseline with an identical parameter and compute budget (~262k parameters, 2500 learning steps) that predicts frames directly in pixel space degrades 2.3× faster over a 30-step rollout than JEPA — confirming that the representational choice, not model capacity, is what matters.
+1. **It learned the world.** A linear probe recovers the logo's exact (y, x) position from the frozen 32-d latent to within **0.79 px** — though it was never given a coordinate.
+2. **It can dream (once you add a decoder).** Bolt an optional decoder onto the frozen latents and roll the predictor forward: it renders a correct **future-frame video** of the bounce, including wall reflections, for ~20 steps before latent drift sets in, even in the presence of environment noise.
+3. **Latent-space prediction beats pixel-space prediction.** An autoencoder-style pixel-space baseline with an identical parameter and compute budget (~262k parameters, 2500 learning steps) that predicts frames directly in pixel space has a 5.5× higher mean MSE over a 30-step rollout than JEPA — confirming that the representational choice, not model capacity, is what matters.
 
 It is a toy and it is also a correct, working instance of the idea behind I-JEPA, V-JEPA, and V-JEPA 2.
 
@@ -49,7 +49,7 @@ flowchart LR
 
 ## Why a bouncing logo?
 
-It is a super simple system that still has the property that matters: The system is **completely predictable from two frames** (position + velocity → the underlying physics, bounces included). Gaussian noise on each frame means the exact pixel values are not predictable, so an effective architecture should for the most part ignore them if it is trying to learn the world dynamics. A context of two stacked frames is necessary and sufficient — exactly the spatio-temporal setup real video JEPAs use, minus a million hours of internet video.
+It is a super simple system that still has the property that matters: The system is **completely predictable from two frames** (position + velocity → the underlying physics, bounces included). Gaussian noise on each frame means the exact pixel values are not predictable, so an effective architecture should ignore pixel level fluctuation to learn the world dynamics. A context of two stacked frames is necessary and sufficient — exactly the spatio-temporal setup real video JEPAs use, minus a million hours of internet video.
 
 ## Method
 
@@ -75,18 +75,18 @@ All numbers are produced by `uv run python scripts/train.py` (seed 0) and saved 
 
 | Result | Value | What it shows |
 |---|---:|---|
-| Linear-probe position RMSE | **0.87 px** (box is 16 px) | the 32-d latent secretly encodes exact world state |
-| JEPA forecast MSE, 1 step | **0.00054** | near-perfect short-horizon prediction |
-| JEPA forecast MSE, 30 steps | **0.034** | graceful latent-rollout drift, not collapse |
-| MLP baseline MSE, 1 step | 0.00613 | 11× worse than JEPA from the first step |
-| MLP baseline MSE, 30 steps | 0.050 | 1.5× worse than JEPA at the horizon |
-| JEPA mean MSE over 30 steps | **0.020** | vs. baseline mean **0.047** (2.3× worse) |
+| Linear-probe position RMSE | **0.79 px** (box is 16 px) | the 32-d latent secretly encodes exact world state |
+| JEPA forecast MSE, 1 step | **0.00147** | near-perfect short-horizon prediction |
+| JEPA forecast MSE, 30 steps | **0.029** | graceful latent-rollout drift, not collapse |
+| MLP baseline MSE, 1 step | 0.00715 | 4.9× worse than JEPA from the first step |
+| MLP baseline MSE, 30 steps | 0.050 | 1.7× worse than JEPA at the horizon |
+| JEPA mean MSE over 30 steps | **0.0086** | vs. baseline mean **0.047** (5.5× worse) |
 | Embedding std (collapse check) | **~3.0** (not 0) | the representation never collapsed |
 
 ## Reproduce
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/BeepBo0p/dvd-jepa
 cd dvd-jepa
 uv sync
 
@@ -130,7 +130,7 @@ DVD-JEPA is a toy, but every moving part has a full-scale counterpart:
 5. A. Bardes, J. Ponce, Y. LeCun. *VICReg: Variance-Invariance-Covariance Regularization for Self-Supervised Learning.* ICLR 2022.
 6. J.-B. Grill et al. *Bootstrap Your Own Latent (BYOL).* NeurIPS 2020.
 
-## Citation
+## Based off of:
 
 ```bibtex
 @software{dvdjepa2026,
@@ -138,6 +138,17 @@ DVD-JEPA is a toy, but every moving part has a full-scale counterpart:
   author = {Wagh, Mandar},
   year   = {2026},
   url    = {https://github.com/mandarwagh9/dvd-jepa}
+}
+```
+
+## Citation
+
+```bibtex
+@software{noisy_dvdjepa2026,
+  title  = {DVD-JEPA: a tiny JEPA world model of a noisy bouncing logo},
+  author = {Brinch van Meenen, Henrik},
+  year   = {2026},
+  url    = {https://github.com/BeepBo0p/dvd-jepa}
 }
 ```
 
